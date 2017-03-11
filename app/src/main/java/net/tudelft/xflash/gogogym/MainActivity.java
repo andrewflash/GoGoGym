@@ -137,7 +137,7 @@ public class MainActivity extends ActionBarActivity implements
 
         // Enable either the Request Updates button or the Remove Updates button depending on
         // whether activity updates have been requested.
-        setButtonsEnabledState();
+        setActivityButtonsEnabledState();
 
         // Reuse the value of mDetectedActivities from the bundle if possible. This maintains state
         // across device orientation changes. If mDetectedActivities is not stored in the bundle,
@@ -176,7 +176,7 @@ public class MainActivity extends ActionBarActivity implements
 
         // Get the value of mGeofencesAdded from SharedPreferences. Set to false as a default.
         mGeofencesAdded = mSharedPreferences.getBoolean(Constants.GEOFENCES_ADDED_KEY, false);
-        setButtonsEnabledState();
+        setGeofenceButtonsEnabledState();
 
         // Get the geofences used. Geofence data is hard coded in this sample.
         populateGeofenceList();
@@ -294,34 +294,6 @@ public class MainActivity extends ActionBarActivity implements
     }
 
     /**
-     * Runs when the result of calling requestActivityUpdates() and removeActivityUpdates() becomes
-     * available. Either method can complete successfully or with an error.
-     *
-     * @param status The Status returned through a PendingIntent when requestActivityUpdates()
-     *               or removeActivityUpdates() are called.
-     */
-    public void onResult(Status status) {
-        if (status.isSuccess()) {
-            // Toggle the status of activity updates requested, and save in shared preferences.
-            boolean requestingUpdates = !getUpdatesRequestedState();
-            setUpdatesRequestedState(requestingUpdates);
-
-            // Update the UI. Requesting activity updates enables the Remove Activity Updates
-            // button, and removing activity updates enables the Add Activity Updates button.
-            setButtonsEnabledState();
-
-            Toast.makeText(
-                    this,
-                    getString(requestingUpdates ? R.string.activity_updates_added :
-                            R.string.activity_updates_removed),
-                    Toast.LENGTH_SHORT
-            ).show();
-        } else {
-            Log.e(TAG, "Error adding or removing activity detection: " + status.getStatusMessage());
-        }
-    }
-
-    /**
      * Gets a PendingIntent to be sent for each activity detection.
      */
     private PendingIntent getActivityDetectionPendingIntent() {
@@ -337,7 +309,7 @@ public class MainActivity extends ActionBarActivity implements
      * enabled if the user hasn't yet requested activity updates. The Remove Activity Updates button
      * is enabled if the user has requested activity updates.
      */
-    private void setButtonsEnabledState() {
+    private void setActivityButtonsEnabledState() {
         if (getUpdatesRequestedState()) {
             mRequestActivityUpdatesButton.setEnabled(false);
             mRemoveActivityUpdatesButton.setEnabled(true);
@@ -345,6 +317,9 @@ public class MainActivity extends ActionBarActivity implements
             mRequestActivityUpdatesButton.setEnabled(true);
             mRemoveActivityUpdatesButton.setEnabled(false);
         }
+    }
+
+    private void setGeofenceButtonsEnabledState() {
         if (mGeofencesAdded) {
             mAddGeofencesButton.setEnabled(false);
             mRemoveGeofencesButton.setEnabled(true);
@@ -509,7 +484,7 @@ public class MainActivity extends ActionBarActivity implements
 
             // Update the UI. Adding geofences enables the Remove Geofences button, and removing
             // geofences enables the Add Geofences button.
-            setButtonsEnabledState();
+            setGeofenceButtonsEnabledState();
 
             Toast.makeText(
                     this,
