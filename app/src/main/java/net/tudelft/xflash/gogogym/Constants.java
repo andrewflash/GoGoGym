@@ -21,6 +21,9 @@ import android.content.res.Resources;
 
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.HashMap;
 
 /**
  * Constants used in this sample.
@@ -90,5 +93,32 @@ public final class Constants {
             default:
                 return resources.getString(R.string.unidentifiable_activity, detectedActivityType);
         }
+    }
+
+    public static final String GEOFENCES_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
+
+    /**
+     * Used to set an expiration time for a geofence. After this amount of time Location Services
+     * stops tracking the geofence.
+     */
+    public static final long GEOFENCE_EXPIRATION_IN_HOURS = 48;
+
+    /**
+     * For this sample, geofences expire after twelve hours.
+     */
+    public static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
+            GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
+    public static final float GEOFENCE_RADIUS_IN_METERS = 100; // 100 m
+
+    /**
+     * Map for storing information about airports in the Zurich area.
+     */
+    public static final HashMap<String, LatLng> GOGOGYM_MERCHANTS = new HashMap<String, LatLng>();
+    static {
+        // Zurich HB Gym.
+        GOGOGYM_MERCHANTS.put("ZHB", new LatLng(47.377923, 8.540190));
+
+        // Schiffbau Gym.
+        GOGOGYM_MERCHANTS.put("SCHIFFBAU", new LatLng(47.388900, 8.518360));
     }
 }
