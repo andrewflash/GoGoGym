@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,6 +38,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
+
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TabHost;
@@ -189,6 +192,28 @@ public class DashboardActivity extends AppCompatActivity
         // Draw PANDA
         GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
         gifImageView.setGifImageResource(R.drawable.pandas_happy);
+
+        // Progress Bar (energy & exp)
+        ProgressBar pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
+        ProgressBar pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
+
+        Integer pg_exp_int = pg_exp.getProgress();  // get value exp
+        pg_exp.setProgress((int)(Math.random()*100 + 1)); // set value exp
+
+        // Set PANDA
+        // TODO: Threshold value, mood managament
+        // Happy
+        gifImageView.setGifImageResource(R.drawable.pandas_happy);
+        // Eating
+        gifImageView.setGifImageResource(R.drawable.pandas_eating);
+        // Sad
+        gifImageView.setGifImageResource(R.drawable.pandas_sad);
+        // Dead
+        gifImageView.setGifImageResource(R.drawable.pandas_dead);
+
+
+        pg_exp.setMax(100);    // Max exp
+        pg_energy.setMax(100);  // Max energy
 
         // Tab Host
         TabHost host = (TabHost)findViewById(R.id.tabHost);

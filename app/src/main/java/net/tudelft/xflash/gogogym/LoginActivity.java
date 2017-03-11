@@ -118,11 +118,15 @@ public class LoginActivity extends FragmentActivity {
             public void onClick(View v) {
                 EditText inputEmail = (EditText) findViewById(R.id.input_email);
                 EditText inputPassword = (EditText) findViewById(R.id.input_password);
-                if (inputEmail.getText().toString().equals("") && inputPassword.getText().toString().equals("")) {
+                if (!inputEmail.getText().toString().equals("") && !inputPassword.getText().toString().equals("")) {
                     Intent main = new Intent(LoginActivity.this, DashboardActivity.class);
+
+                    // TODO: Authentikasi email/username & password
+
                     main.putExtra("name", "Hendra");
                     main.putExtra("surname", "Hadhil C");
                     main.putExtra("imageUrl", "");
+
                     startActivity(main);
                     finish();
                 } else {
