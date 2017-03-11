@@ -1,8 +1,9 @@
 package net.tudelft.xflash.gogogym;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,6 +13,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ImageView;
+
+import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -20,17 +27,31 @@ public class DashboardActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        Bundle inBundle = getIntent().getExtras();
+        String name = inBundle.get("name").toString();
+        String surname = inBundle.get("surname").toString();
+        String imageUrl = inBundle.get("imageUrl").toString();
+
+        // Set title
+        setTitle("" + name + " " + surname);
+
+        // FB context
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
+        // Download profile pic async
+        if(imageUrl == "")
+        {
+            Profile profile = Profile.getCurrentProfile();
+            imageUrl = profile.getProfilePictureUri(200,200).toString();
+        }
+
+        if(imageUrl != "") {
+            new DownloadImage((ImageView) findViewById(R.id.profile_drawer)).execute(imageUrl);
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -69,6 +90,13 @@ public class DashboardActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if(id == R.id.action_logout)
+        {
+            LoginManager.getInstance().logOut();
+            Intent login = new Intent(DashboardActivity.this, LoginActivity.class);
+            startActivity(login);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
