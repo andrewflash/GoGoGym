@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TabHost;
 
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
@@ -61,7 +62,40 @@ public class DashboardActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Draw PANDA
+        GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
+        gifImageView.setGifImageResource(R.drawable.pandas_happy);
+
+        // Tab Host
+        TabHost host = (TabHost)findViewById(R.id.tabHost);
+        host.setup();
+
+        //Tab 1 -- Activity
+        TabHost.TabSpec spec = host.newTabSpec("Activity");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("Activity");
+        host.addTab(spec);
+
+        //Tab 2 -- Location
+        spec = host.newTabSpec("Location");
+        spec.setContent(R.id.tab2);
+        spec.setIndicator("Location");
+        host.addTab(spec);
+
+        //Tab 3 -- Inventory
+        spec = host.newTabSpec("Inventory");
+        spec.setContent(R.id.tab3);
+        spec.setIndicator("Inventory");
+        host.addTab(spec);
+
+        //Tab 4 -- Rewards
+        spec = host.newTabSpec("Rewards");
+        spec.setContent(R.id.tab3);
+        spec.setIndicator("Rewards");
+        host.addTab(spec);
     }
+
 
     @Override
     public void onBackPressed() {

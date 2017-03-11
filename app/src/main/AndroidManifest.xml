@@ -25,7 +25,11 @@
 
         <activity
             android:name=".DashboardActivity"
-            android:label="@string/title_activity_dashboard"></activity>
+            android:label="@string/title_activity_dashboard"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:hardwareAccelerated="false">
+
+        </activity>
 
         <activity android:name="com.facebook.FacebookActivity"
             android:configChanges=

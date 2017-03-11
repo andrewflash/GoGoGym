@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -30,6 +33,7 @@ import java.util.Arrays;
 public class LoginActivity extends FragmentActivity {
 
     private LoginButton loginButton;
+    private Button loginButton_nonfb;
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
@@ -69,14 +73,15 @@ public class LoginActivity extends FragmentActivity {
         accessTokenTracker.startTracking();
         profileTracker.startTracking();
 
-        LoginButton loginButton = (LoginButton)findViewById(R.id.login_button);
+        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         callback = new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 AccessToken accessToken = loginResult.getAccessToken();
                 Profile profile = Profile.getCurrentProfile();
                 nextActivity(profile);
-                Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();    }
+                Toast.makeText(getApplicationContext(), "Logging in...", Toast.LENGTH_SHORT).show();
+            }
 
             @Override
             public void onCancel() {
@@ -87,8 +92,27 @@ public class LoginActivity extends FragmentActivity {
                 Log.e("Error", e.getMessage());
             }
         };
-        loginButton.setReadPermissions(Arrays.asList("user_friends","user_photos","public_profile"));
+        loginButton.setReadPermissions(Arrays.asList("user_friends", "user_photos", "public_profile"));
         loginButton.registerCallback(callbackManager, callback);
+
+        // Login Button non-FB
+        Button loginButton_nonfb = (Button) findViewById(R.id.btn_login);
+        loginButton_nonfb.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                EditText inputEmail = (EditText) findViewById(R.id.input_email);
+                EditText inputPassword = (EditText) findViewById(R.id.input_password);
+                if (inputEmail.getText().toString().equals("") && inputPassword.getText().toString().equals("")) {
+                    Intent main = new Intent(LoginActivity.this, DashboardActivity.class);
+                    main.putExtra("name", "Hendra");
+                    main.putExtra("surname", "Hadhil C");
+                    main.putExtra("imageUrl", "");
+                    startActivity(main);
+                    finish();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Please input username and/or password", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
