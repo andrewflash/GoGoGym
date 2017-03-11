@@ -9,6 +9,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,6 +37,13 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Map;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TabHost;
+
+import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -87,6 +97,29 @@ public class DashboardActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
+
+        Bundle inBundle = getIntent().getExtras();
+        String name = inBundle.get("name").toString();
+        String surname = inBundle.get("surname").toString();
+        String imageUrl = inBundle.get("imageUrl").toString();
+
+        // Set title
+        setTitle("" + name + " " + surname);
+
+        // FB context
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
+        // Download profile pic async
+        if(imageUrl == "")
+        {
+            Profile profile = Profile.getCurrentProfile();
+            imageUrl = profile.getProfilePictureUri(200,200).toString();
+        }
+
+        if(imageUrl != "") {
+            new DownloadImage((ImageView) findViewById(R.id.profile_drawer)).execute(imageUrl);
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -146,7 +179,40 @@ public class DashboardActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Draw PANDA
+        GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
+        gifImageView.setGifImageResource(R.drawable.pandas_happy);
+
+        // Tab Host
+        TabHost host = (TabHost)findViewById(R.id.tabHost);
+        host.setup();
+
+        //Tab 1 -- Activity
+        TabHost.TabSpec spec = host.newTabSpec("Activity");
+        spec.setContent(R.id.tab1);
+        spec.setIndicator("Activity");
+        host.addTab(spec);
+
+        //Tab 2 -- Location
+        spec = host.newTabSpec("Location");
+        spec.setContent(R.id.tab2);
+        spec.setIndicator("Location");
+        host.addTab(spec);
+
+        //Tab 3 -- Inventory
+        spec = host.newTabSpec("Inventory");
+        spec.setContent(R.id.tab3);
+        spec.setIndicator("Inventory");
+        host.addTab(spec);
+
+        //Tab 4 -- Rewards
+        spec = host.newTabSpec("Rewards");
+        spec.setContent(R.id.tab3);
+        spec.setIndicator("Rewards");
+        host.addTab(spec);
     }
+
 
     @Override
     public void onBackPressed() {
@@ -175,6 +241,13 @@ public class DashboardActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if(id == R.id.action_logout)
+        {
+            LoginManager.getInstance().logOut();
+            Intent login = new Intent(DashboardActivity.this, LoginActivity.class);
+            startActivity(login);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
