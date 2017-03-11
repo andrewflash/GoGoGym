@@ -99,9 +99,16 @@ public class DashboardActivity extends AppCompatActivity
         setContentView(R.layout.activity_dashboard);
 
         Bundle inBundle = getIntent().getExtras();
-        String name = inBundle.get("name").toString();
-        String surname = inBundle.get("surname").toString();
-        String imageUrl = inBundle.get("imageUrl").toString();
+        String name = "";
+        String surname = "";
+        String imageUrl = "";
+        try {
+            String name = inBundle.get("name").toString();
+            String surname = inBundle.get("surname").toString();
+            String imageUrl = inBundle.get("imageUrl").toString();
+        } catch (Error er) {
+            Log.e('Error', er.getMessage());
+        }
 
         // Set title
         setTitle("" + name + " " + surname);
@@ -110,13 +117,11 @@ public class DashboardActivity extends AppCompatActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
 
         // Download profile pic async
-        if(imageUrl == "")
+        if(imageUrl.equals(""))
         {
             Profile profile = Profile.getCurrentProfile();
             imageUrl = profile.getProfilePictureUri(200,200).toString();
-        }
-
-        if(imageUrl != "") {
+        } else {
             new DownloadImage((ImageView) findViewById(R.id.profile_drawer)).execute(imageUrl);
         }
 
