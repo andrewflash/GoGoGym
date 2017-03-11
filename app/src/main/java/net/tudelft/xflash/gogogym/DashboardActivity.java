@@ -103,11 +103,11 @@ public class DashboardActivity extends AppCompatActivity
         String surname = "";
         String imageUrl = "";
         try {
-            String name = inBundle.get("name").toString();
-            String surname = inBundle.get("surname").toString();
-            String imageUrl = inBundle.get("imageUrl").toString();
+            name = inBundle.get("name").toString();
+            surname = inBundle.get("surname").toString();
+            imageUrl = inBundle.get("imageUrl").toString();
         } catch (Error er) {
-            Log.e('Error', er.getMessage());
+            Log.e("Error", er.getMessage());
         }
 
         // Set title
@@ -120,7 +120,8 @@ public class DashboardActivity extends AppCompatActivity
         if(imageUrl.equals(""))
         {
             Profile profile = Profile.getCurrentProfile();
-            imageUrl = profile.getProfilePictureUri(200,200).toString();
+            if(profile != null)
+                imageUrl = profile.getProfilePictureUri(200,200).toString();
         } else {
             new DownloadImage((ImageView) findViewById(R.id.profile_drawer)).execute(imageUrl);
         }
