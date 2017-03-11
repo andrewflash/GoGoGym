@@ -139,6 +139,7 @@ public class DashboardActivity extends AppCompatActivity
 
         if (getIntent().hasExtra("fromNotification")) {
             isGeofencesEntered = Boolean.TRUE;
+            // ADD POINTS FOR VISITING
         } else {
             isGeofencesEntered = Boolean.FALSE;
         }
@@ -385,9 +386,10 @@ public class DashboardActivity extends AppCompatActivity
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("DashboardActivity", "Activity detected!");
             ArrayList<DetectedActivity> updatedActivities =
                     intent.getParcelableArrayListExtra(Constants.ACTIVITY_EXTRA);
+            Log.d("DashboardActivity", "Activity detected!" + updatedActivities.toString());
+            // ADD POINTS FOR ACTIVITITY
         }
     }
 
