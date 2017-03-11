@@ -52,6 +52,9 @@ public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
 
+    public static UData cur_user;
+    public static DBHandler db;
+
     protected static final String TAG = "DashboardActivity";
 
     /* Geofencing and activity detection */
@@ -98,6 +101,10 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        db = new DBHandler(this);
+        DashboardActivity.cur_user = db.getUData(1);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
@@ -189,6 +196,12 @@ public class DashboardActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
+        int pet_exp = cur_user.pet_exp;
+        int pet_energy = cur_user.pet_energy;
+        int pet_level =  (int) Math.floor(pet_exp/100);
+        int pet_max_energy = 20+pet_level;
+
         // Draw PANDA
         GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
         gifImageView.setGifImageResource(R.drawable.pandas_happy);
@@ -198,22 +211,28 @@ public class DashboardActivity extends AppCompatActivity
         ProgressBar pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
 
         Integer pg_exp_int = pg_exp.getProgress();  // get value exp
-        pg_exp.setProgress((int)(Math.random()*100 + 1)); // set value exp
+        pg_exp.setProgress(pet_exp % 100); // set value exp
+        pg_energy.setProgress(pet_energy);
 
         // Set PANDA
         // TODO: Threshold value, mood managament
-        // Happy
-        gifImageView.setGifImageResource(R.drawable.pandas_happy);
-        // Eating
-        gifImageView.setGifImageResource(R.drawable.pandas_eating);
-        // Sad
-        gifImageView.setGifImageResource(R.drawable.pandas_sad);
-        // Dead
-        gifImageView.setGifImageResource(R.drawable.pandas_dead);
-
+        double ratio = pet_energy /  pet_max_energy;
+        if(ratio > 0.7){
+            // Happy
+            gifImageView.setGifImageResource(R.drawable.pandas_happy);
+        }else if(ratio > 0.5){
+            // Eating
+            gifImageView.setGifImageResource(R.drawable.pandas_eating);
+        }else if(pet_energy >= 1){
+            // Sad
+            gifImageView.setGifImageResource(R.drawable.pandas_sad);
+        }else{
+            // Dead
+            gifImageView.setGifImageResource(R.drawable.pandas_dead);
+        }
 
         pg_exp.setMax(100);    // Max exp
-        pg_energy.setMax(100);  // Max energy
+        pg_energy.setMax(pet_max_energy);  // Max energy
 
         // Tab Host
         TabHost host = (TabHost)findViewById(R.id.tabHost);

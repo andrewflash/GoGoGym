@@ -59,7 +59,7 @@ public class LoginActivity extends FragmentActivity {
 
         //initiate DB & data (only 1st time)
         db.initiateDB();
-        UData dat = new UData(1,"Bontor", "bontor@gmail.com", "12345", 17, "Bambang", 9, 11); boolean check1 = db.addUData(dat); Log.i("haha"," "+check1);
+        UData dat = new UData(1,"Bontor", "bontor@gmail.com", "12345", 17, "Bambang", 19, 571); boolean check1 = db.addUData(dat); Log.i("haha"," "+check1);
         boolean check5 = db.addGym("ETH",1.23,5.67); Log.i("haha5"," "+check5);
 
 
@@ -118,13 +118,13 @@ public class LoginActivity extends FragmentActivity {
             public void onClick(View v) {
                 EditText inputEmail = (EditText) findViewById(R.id.input_email);
                 EditText inputPassword = (EditText) findViewById(R.id.input_password);
-                if (!inputEmail.getText().toString().equals("") && !inputPassword.getText().toString().equals("")) {
+                if (inputEmail.getText().toString().equals("bontor") && !inputPassword.getText().toString().equals("")) {
                     Intent main = new Intent(LoginActivity.this, DashboardActivity.class);
 
                     // TODO: Authentikasi email/username & password
 
-                    main.putExtra("name", "Hendra");
-                    main.putExtra("surname", "Hadhil C");
+                    main.putExtra("name", "Bontor");
+                    main.putExtra("surname", "Humala");
                     main.putExtra("imageUrl", "");
 
                     startActivity(main);
