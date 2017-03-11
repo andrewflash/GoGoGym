@@ -52,7 +52,7 @@ public class DashboardActivity extends AppCompatActivity
      * Provides the entry point to Google Play services.
      */
     protected GoogleApiClient mGoogleApiClient;
-    
+
     /**
      * The DetectedActivities that we track in this sample. We use this for initializing the
      * {@code DetectedActivitiesAdapter}. We also use this for persisting state in
@@ -254,6 +254,8 @@ public class DashboardActivity extends AppCompatActivity
         if (isGeofencesEntered) {
             stopGeofences();
             startActivityUpdates();
+            Toast.makeText(this, getString(R.string.start_activity_detection),
+                    Toast.LENGTH_LONG).show();
         }
         else {
             try {
