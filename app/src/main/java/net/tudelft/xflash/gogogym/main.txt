@@ -1,0 +1,4 @@
+DBHandler db = new DBHandler(this);
+UData dat = new UData(1,"test",22, "Lucky", 10, 12);
+
+UData check = stringify_UData(db.getUData(1));
