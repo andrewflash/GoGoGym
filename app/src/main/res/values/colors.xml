@@ -8,4 +8,5 @@
     <color name="gradient_end">#d50000</color>
     <color name="login_btn">#4caf50</color>
     <color name="white">#ffffff</color>
+    <color name="gray_8080">#808080</color>
 </resources>
