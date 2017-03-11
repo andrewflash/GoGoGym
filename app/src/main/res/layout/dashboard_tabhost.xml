@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:background="@color/bg_dashboard"
         android:layout_centerHorizontal="true">
 
         <LinearLayout
@@ -22,8 +21,10 @@
 
             <TabWidget
                 android:id="@android:id/tabs"
+                android:background="@color/navbar_dashboard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"></TabWidget>
+                android:layout_height="wrap_content">
+            </TabWidget>
 
             <FrameLayout
                 android:id="@android:id/tabcontent"

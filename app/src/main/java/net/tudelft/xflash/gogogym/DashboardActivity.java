@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
@@ -23,12 +24,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.images.Size;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
@@ -126,7 +129,7 @@ public class DashboardActivity extends AppCompatActivity
             if(profile != null)
                 imageUrl = profile.getProfilePictureUri(200,200).toString();
         } else {
-            new DownloadImage((ImageView) findViewById(R.id.profile_drawer)).execute(imageUrl);
+//            new DownloadImage((ImageView) findViewById(R.id.profile_drawer)).execute(imageUrl);
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -182,6 +185,7 @@ public class DashboardActivity extends AppCompatActivity
         if (getIntent().hasExtra("fromNotification")) {
             isGeofencesEntered = Boolean.TRUE;
             // ADD POINTS FOR VISITING
+
         } else {
             isGeofencesEntered = Boolean.FALSE;
         }
@@ -192,6 +196,7 @@ public class DashboardActivity extends AppCompatActivity
         // Draw PANDA
         GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
         gifImageView.setGifImageResource(R.drawable.pandas_happy);
+
 
         // Progress Bar (energy & exp)
         ProgressBar pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
@@ -239,9 +244,17 @@ public class DashboardActivity extends AppCompatActivity
 
         //Tab 4 -- Rewards
         spec = host.newTabSpec("Rewards");
-        spec.setContent(R.id.tab3);
+        spec.setContent(R.id.tab4);
         spec.setIndicator("Rewards");
         host.addTab(spec);
+
+        // Change Tab color
+        for(int i=0; i<host.getTabWidget().getChildCount(); i++)
+        {
+            TextView tv = (TextView) host.getTabWidget().getChildAt(i).findViewById(android.R.id.title); //Unselected Tabs
+            tv.setTextColor(Color.parseColor("#ffffff"));
+            tv.setTextSize(10);
+        }
     }
 
 
