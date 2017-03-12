@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,9 +122,9 @@ public class DBHandler extends SQLiteOpenHelper {
     // Getting one shop
     public UData getUData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id="+id;
+        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id=?";
 
-        Cursor cursor = db.rawQuery(sql, null);
+        Cursor cursor = db.rawQuery(sql, new String[]{Integer.toString(id)});
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -159,9 +160,9 @@ public class DBHandler extends SQLiteOpenHelper {
     public String readUData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id="+id;
+        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id=?";
 
-        Cursor cursor = db.rawQuery(sql, null);
+        Cursor cursor = db.rawQuery(sql, new String[]{Integer.toString(id)});
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -179,6 +180,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         // Inserting Row
         boolean status = db.insert(TABLE_ULOG, null, values) > 0;
+
         db.close(); // Closing database connection
         return status;
     }
@@ -186,10 +188,10 @@ public class DBHandler extends SQLiteOpenHelper {
     public void finishLog(int user_id, int gym_id, String start_time, String finish_time) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sql = "UPDATE "+TABLE_ULOG+" SET finish_time = "+finish_time+" WHERE user_id="+user_id
-                +" AND gym_id = "+gym_id+" AND start_time="+start_time;
+        String sql = "UPDATE "+TABLE_ULOG+" SET finish_time=? WHERE user_id=? AND gym_id=? AND start_time=?";
 
-        db.rawQuery(sql, null);
+        db.rawQuery(sql, new String[] {finish_time, Integer.toString(user_id), Integer.toString(gym_id), start_time});
+
         db.close();
     }
 
@@ -200,6 +202,9 @@ public class DBHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
+
+        Log.d("DBHandler", "cursor all logs: " + Integer.toString(cursor.getCount()));
+        Log.d("DBHandler", "cursor all logs str: " + cursor.toString());
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
@@ -262,9 +267,10 @@ public class DBHandler extends SQLiteOpenHelper {
     public void updatePoint(int user_id, int exp, int energy){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sql = "UPDATE "+TABLE_UDATA+" SET pet_exp = "+exp+ ", pet_energy = "+ energy +" WHERE id="+user_id;
+        String sql = "UPDATE "+TABLE_UDATA+" SET pet_exp=?, pet_energy=? WHERE id=?";
 
-        db.rawQuery(sql, null);
+        db.rawQuery(sql, new String[] {Integer.toString(exp), Integer.toString(energy), Integer.toString(user_id)});
+
         db.close();
     }
 

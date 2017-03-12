@@ -402,10 +402,11 @@ public class DashboardActivity extends AppCompatActivity
             db.addLog( Integer.parseInt(userid), 1, start_time, Constants.VISIT_DESC);
             UData userdat = db.getUData(Integer.parseInt(userid));
             int updatedExp = userdat.pet_exp + Constants.VISIT_EXP_INC;
-            int updatedEnergy = userdat.pet_exp + Constants.VISIT_ENERGY_INC;
+            int updatedEnergy = userdat.pet_energy + Constants.VISIT_ENERGY_INC;
             db.updatePoint(Integer.parseInt(userid), updatedExp, updatedEnergy);
             isGeofencesEntered = Boolean.FALSE;
-            adapter.notifyDataSetChanged();
+            activityLogs = db.getAllLogs();
+            adapter = new detectedActivitiesAdapter(this, 0, activityLogs);
         }
         else {
             try {
@@ -578,7 +579,8 @@ public class DashboardActivity extends AppCompatActivity
                 int updatedEnergy = userdat.pet_energy + Constants.ACTIVE_ENERGY_INC;
                 db.updatePoint(Integer.parseInt(userid), updatedExp, updatedEnergy);
 
-                adapter.notifyDataSetChanged();
+                activityLogs = db.getAllLogs();
+                adapter = new detectedActivitiesAdapter(getApplicationContext(), 0, activityLogs);
             }
         }
     }
