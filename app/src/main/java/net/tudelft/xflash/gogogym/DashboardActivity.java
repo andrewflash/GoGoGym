@@ -208,6 +208,9 @@ public class DashboardActivity extends AppCompatActivity
 
         db = new DBHandler(this);
 
+        // TODO: Display activities
+        db.getAllLogs();
+
         // Set PANDA
         // TODO: Threshold value, mood managament
         // Happy
