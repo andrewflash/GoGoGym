@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,8 @@ public class DBHandler extends SQLiteOpenHelper {
                 + "user_id INT,"
                 + "gym_id INT,"
                 + "start_time TEXT,"
-                + "finish_time TEXT)";
+                + "finish_time TEXT,"
+                + "log_desc TEXT)";
         db.execSQL(CREATE_USERLOG_TABLE);
 
         //initiateData();
@@ -120,9 +122,22 @@ public class DBHandler extends SQLiteOpenHelper {
     // Getting one shop
     public UData getUData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id="+id;
+        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id=?";
 
-        Cursor cursor = db.rawQuery(sql, null);
+        Cursor cursor = db.rawQuery(sql, new String[]{Integer.toString(id)});
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        UData ud = new UData(Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1), cursor.getString(2), cursor.getString(3), Integer.parseInt(cursor.getString(4)), cursor.getString(5), Integer.parseInt(cursor.getString(6)), Integer.parseInt(cursor.getString(7)));
+        return ud;
+    }
+
+    public UData findUData(String user, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE (user_name=? AND password=?) OR (email=? AND password=?)";
+
+        Cursor cursor = db.rawQuery(sql, new String[] {user, password, user, password});
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -145,37 +160,67 @@ public class DBHandler extends SQLiteOpenHelper {
     public String readUData(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id="+id;
+        String sql = "SELECT  * FROM " + TABLE_UDATA + " WHERE id=?";
 
-        Cursor cursor = db.rawQuery(sql, null);
+        Cursor cursor = db.rawQuery(sql, new String[]{Integer.toString(id)});
         if (cursor != null)
             cursor.moveToFirst();
 
         return cursor.getString(0);
     }
 
-    public boolean addVisit(int user_id, int gym_id, String time){
+    public boolean addLog(int user_id, int gym_id, String time, String desc){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("user_id", user_id);
         values.put("gym_id", gym_id);
         values.put("start_time", time);
+        values.put("log_desc", desc);
 
         // Inserting Row
         boolean status = db.insert(TABLE_ULOG, null, values) > 0;
+
         db.close(); // Closing database connection
         return status;
     }
 
-    public void finishVisit(int user_id, int gym_id, String start_time, String finish_time) {
+    public void finishLog(int user_id, int gym_id, String start_time, String finish_time) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sql = "UPDATE "+TABLE_ULOG+" SET finish_time = "+finish_time+" WHERE user_id="+user_id
-                +" AND gym_id = "+gym_id+" AND start_time="+start_time;
+        String sql = "UPDATE "+TABLE_ULOG+" SET finish_time=? WHERE user_id=? AND gym_id=? AND start_time=?";
 
-        db.rawQuery(sql, null);
+        db.rawQuery(sql, new String[] {finish_time, Integer.toString(user_id), Integer.toString(gym_id), start_time});
+
         db.close();
+    }
+
+    public ArrayList<UserLog> getAllLogs() {
+        ArrayList<UserLog> logsList = new ArrayList<UserLog>();
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_ULOG;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        Log.d("DBHandler", "cursor all logs: " + Integer.toString(cursor.getCount()));
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                UserLog ll = new UserLog( (int) Integer.parseInt(cursor.getString(0)),
+                        (int) Integer.parseInt(cursor.getString(1)),
+                        (int) Integer.parseInt(cursor.getString(2)),
+                        cursor.getString(3),cursor.getString(4),cursor.getString(5)
+                );
+
+                // Adding contact to list
+                logsList.add(ll);
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return logsList;
     }
 
     public boolean addGym(String gym_name, double longitude, double latitude){
@@ -221,9 +266,10 @@ public class DBHandler extends SQLiteOpenHelper {
     public void updatePoint(int user_id, int exp, int energy){
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sql = "UPDATE "+TABLE_UDATA+" SET pet_exp = "+exp+ ", pet_energy = "+ energy +" WHERE id="+user_id;
+        String sql = "UPDATE "+TABLE_UDATA+" SET pet_exp=?, pet_energy=? WHERE id=?";
 
-        db.rawQuery(sql, null);
+        db.rawQuery(sql, new String[] {Integer.toString(exp), Integer.toString(energy), Integer.toString(user_id)});
+
         db.close();
     }
 

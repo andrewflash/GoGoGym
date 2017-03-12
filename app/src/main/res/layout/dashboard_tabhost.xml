@@ -38,11 +38,10 @@
                     android:background="@color/white"
                     android:orientation="vertical">
 
-                    <TextView
+                    <ListView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="10dp"
-                        android:text="This is tab 1" />
+                        android:id="@+id/detected_activities_listview"></ListView>
 
                 </LinearLayout>
 
