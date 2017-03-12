@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.content.Intent;
@@ -114,7 +115,10 @@ public class DashboardActivity extends AppCompatActivity
 
     private ListView activity_lv;
 
-    ArrayAdapter<UserLog> adapter;
+    private Handler handler;
+    private Runnable runnable;
+
+    private ArrayAdapter<UserLog> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,6 +228,20 @@ public class DashboardActivity extends AppCompatActivity
         adapter = new detectedActivitiesAdapter(this, 0, activityLogs);
         activity_lv = (ListView) findViewById(R.id.detected_activities_listview);
         activity_lv.setAdapter(adapter);
+
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                activityLogs = db.getAllLogs();
+                adapter = new detectedActivitiesAdapter(getApplicationContext(), 0, activityLogs);
+                handler.postDelayed(this, 1000);
+                activity_lv.setAdapter(adapter);
+            }
+        };
+
+//Start
+        handler.postDelayed(runnable, 1000);
 
         // Set PANDA
         // TODO: Threshold value, mood managament
@@ -410,7 +428,7 @@ public class DashboardActivity extends AppCompatActivity
         }
         else {
             try {
-                stopActivityUpdates();
+//                stopActivityUpdates();
             } catch (Error err) {
 
             }

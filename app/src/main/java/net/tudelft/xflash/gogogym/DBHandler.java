@@ -204,7 +204,6 @@ public class DBHandler extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
 
         Log.d("DBHandler", "cursor all logs: " + Integer.toString(cursor.getCount()));
-        Log.d("DBHandler", "cursor all logs str: " + cursor.toString());
 
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {

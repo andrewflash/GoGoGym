@@ -2,6 +2,8 @@ package net.tudelft.xflash.gogogym;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,19 +40,24 @@ class detectedActivitiesAdapter extends ArrayAdapter<UserLog> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.property_layout, null);
 
-        TextView activity_name = (TextView) view.findViewById(R.id.activity);
+        TextView activity_name = (TextView) view.findViewById(R.id.activityName);
         TextView start_time = (TextView) view.findViewById(R.id.startTime);
         TextView end_time = (TextView) view.findViewById(R.id.endTime);
         ImageView image = (ImageView) view.findViewById(R.id.act_image);
 
         //set activity, start end time attributes
-        activity_name.setText("$" + String.valueOf(ulog.log_desc));
-        start_time.setText("Start: " + String.valueOf(ulog.start_time));
-        end_time.setText("End: " + String.valueOf(ulog.finish_time));
+        activity_name.setText(String.valueOf(ulog.log_desc));
+        start_time.setText(String.valueOf(ulog.start_time).split("GMT")[0]);
 
         //get the image associated with this activity
         int imageID = context.getResources().getIdentifier(ulog.getImage(), "drawable", context.getPackageName());
         image.setImageResource(imageID);
+        if (ulog.getImage().equals(Constants.VISIT_DESC)) {
+            image.setColorFilter(Color.GRAY);
+        } else {
+            image.setColorFilter(Color.GRAY);
+        }
+
 
         return view;
     }

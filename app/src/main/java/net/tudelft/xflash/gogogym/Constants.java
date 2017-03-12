@@ -33,13 +33,13 @@ public final class Constants {
     private Constants() {
     }
 
-    public static final int VISIT_EXP_INC = 100;
+    public static final int VISIT_EXP_INC = 20;
 
-    public static final int VISIT_ENERGY_INC = 20;
+    public static final int VISIT_ENERGY_INC = 10;
 
-    public static final int ACTIVE_EXP_INC = 50;
+    public static final int ACTIVE_EXP_INC = 10;
 
-    public static final int ACTIVE_ENERGY_INC = 10;
+    public static final int ACTIVE_ENERGY_INC = 5;
 
     public static final String VISIT_DESC = "Visit gym";
 

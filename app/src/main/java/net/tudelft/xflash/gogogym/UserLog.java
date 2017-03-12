@@ -19,13 +19,13 @@ public class UserLog {
 	}
 
 	public String getImage() {
-		if(this.log_desc == Constants.ACTIVE_DESC){
+		if(this.log_desc.equals(Constants.ACTIVE_DESC)){
 			return "ic_directions_run_black_24dp";
 		}
-		else if (this.log_desc == Constants.VISIT_DESC){
+		else if (this.log_desc.equals(Constants.VISIT_DESC)){
 			return "ic_beenhere_black_24dp";
 		}
-		else return "";
+		else return this.log_desc;
 	}
 
 	public String stringify_UserLog() {
