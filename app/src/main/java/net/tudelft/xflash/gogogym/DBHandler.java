@@ -193,8 +193,8 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public List<UserLog> getAllLogs() {
-        List<UserLog> logsList = new ArrayList<UserLog>();
+    public ArrayList<UserLog> getAllLogs() {
+        ArrayList<UserLog> logsList = new ArrayList<UserLog>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_ULOG;
 

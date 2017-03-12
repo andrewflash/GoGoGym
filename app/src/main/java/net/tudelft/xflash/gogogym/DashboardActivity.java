@@ -23,6 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +41,7 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
@@ -105,22 +108,30 @@ public class DashboardActivity extends AppCompatActivity
 
     private String start_time;
     private String userid;
+    private String name;
+
+    private ArrayList<UserLog> activityLogs = new ArrayList<>();
+
+    private ListView activity_lv;
+
+    ArrayAdapter<UserLog> adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
         Bundle inBundle = getIntent().getExtras();
-        String name = "";
         String surname = "";
         String imageUrl = "";
-        try {
+        if ((inBundle.get("userid") == null) || ((inBundle.get("userid") == "null"))){
+            userid = getLoggedId();
+            name = getLoggedName();
+        } else {
             userid = inBundle.get("userid").toString();
             name = inBundle.get("name").toString();
-            surname = inBundle.get("surname").toString();
-            imageUrl = inBundle.get("imageUrl").toString();
-        } catch (Error er) {
-            Log.e("Error", er.getMessage());
+            setLoggedId(userid);
+            setLoggedName(name);
         }
 
         // Set title
@@ -209,7 +220,10 @@ public class DashboardActivity extends AppCompatActivity
         db = new DBHandler(this);
 
         // TODO: Display activities
-        db.getAllLogs();
+        activityLogs = db.getAllLogs();
+        adapter = new detectedActivitiesAdapter(this, 0, activityLogs);
+        activity_lv = (ListView) findViewById(R.id.detected_activities_listview);
+        activity_lv.setAdapter(adapter);
 
         // Set PANDA
         // TODO: Threshold value, mood managament
@@ -381,7 +395,7 @@ public class DashboardActivity extends AppCompatActivity
         if (isGeofencesEntered) {
             stopGeofences();
             startActivityUpdates();
-            Toast.makeText(this, getString(R.string.start_activity_detection),
+            Toast.makeText(this, "Welcome back " + name + ", lets start working out!",
                     Toast.LENGTH_LONG).show();
             // TODO: ADD EXP POINTS & RECORDS FOR VISITING
             start_time = Calendar.getInstance().getTime().toString();
@@ -391,6 +405,7 @@ public class DashboardActivity extends AppCompatActivity
             int updatedEnergy = userdat.pet_exp + Constants.VISIT_ENERGY_INC;
             db.updatePoint(Integer.parseInt(userid), updatedExp, updatedEnergy);
             isGeofencesEntered = Boolean.FALSE;
+            adapter.notifyDataSetChanged();
         }
         else {
             try {
@@ -482,6 +497,30 @@ public class DashboardActivity extends AppCompatActivity
         return getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
     }
 
+    private String getLoggedId() {
+        return getSharedPreferencesInstance()
+                .getString(Constants.LOGGED_USERID, "1"); // should have been 0 --> logged out
+    }
+
+    private void setLoggedId(String loggedId) {
+        getSharedPreferencesInstance()
+                .edit()
+                .putString(Constants.LOGGED_USERID, loggedId)
+                .commit();
+    }
+
+    private String getLoggedName() {
+        return getSharedPreferencesInstance()
+                .getString(Constants.LOGGED_USERNAME, "Bontor"); // should have been 0 --> logged out
+    }
+
+    private void setLoggedName(String loggedId) {
+        getSharedPreferencesInstance()
+                .edit()
+                .putString(Constants.LOGGED_USERNAME, loggedId)
+                .commit();
+    }
+
     /**
      * Retrieves the boolean from SharedPreferences that tracks whether we are requesting activity
      * updates.
@@ -538,6 +577,8 @@ public class DashboardActivity extends AppCompatActivity
                 int updatedExp = userdat.pet_exp + Constants.ACTIVE_EXP_INC;
                 int updatedEnergy = userdat.pet_energy + Constants.ACTIVE_ENERGY_INC;
                 db.updatePoint(Integer.parseInt(userid), updatedExp, updatedEnergy);
+
+                adapter.notifyDataSetChanged();
             }
         }
     }

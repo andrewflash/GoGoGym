@@ -18,6 +18,16 @@ public class UserLog {
 		this.log_desc = log_desc;
 	}
 
+	public String getImage() {
+		if(this.log_desc == Constants.ACTIVE_DESC){
+			return "ic_directions_run_black_24dp";
+		}
+		else if (this.log_desc == Constants.VISIT_DESC){
+			return "ic_beenhere_black_24dp";
+		}
+		else return "";
+	}
+
 	public String stringify_UserLog() {
 		return id + ";" + user_id + ";" + gym_id + ";" + start_time + ";" + finish_time + ";" + log_desc + ";";
 	}

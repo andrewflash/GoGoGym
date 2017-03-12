@@ -58,6 +58,10 @@ public final class Constants {
 
     public static final String DETECTED_ACTIVITIES = PACKAGE_NAME + ".DETECTED_ACTIVITIES";
 
+    public static final String LOGGED_USERID = PACKAGE_NAME + ".LOGGED_ID";
+
+    public static final String LOGGED_USERNAME = PACKAGE_NAME + ".LOGGED_NAME";
+
     /**
      * The desired time between activity detections. Larger values result in fewer activity
      * detections while improving battery life. A value of 0 results in activity detections at the
@@ -128,9 +132,9 @@ public final class Constants {
     public static final HashMap<String, LatLng> GOGOGYM_MERCHANTS = new HashMap<String, LatLng>();
     static {
         // Zurich HB Gym.
-        GOGOGYM_MERCHANTS.put("ZHB", new LatLng(47.377923, 8.540190));
+        GOGOGYM_MERCHANTS.put("ZURICHHB", new LatLng(47.377923, 8.540190));
 
-        // Schiffbau Gym.
-        GOGOGYM_MERCHANTS.put("SCHIFFBAU", new LatLng(47.388900, 8.518360));
+        // Sihlquai Gym.
+        GOGOGYM_MERCHANTS.put("SIHLQUAI", new LatLng(47.38544974, 8.53296518));
     }
 }
