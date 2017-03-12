@@ -59,7 +59,7 @@ public class LoginActivity extends FragmentActivity {
 
         //initiate DB & data (only 1st time)
         db.initiateDB();
-        UData dat = new UData(1,"Bontor", "bontor@gmail.com", "12345", 17, "Bambang", 9, 11); boolean check1 = db.addUData(dat); Log.i("haha"," "+check1);
+        UData dat = new UData(1,"Bontor", "bontor@gmail.com", "12345", 17, "Bambang", 4, 201); boolean check1 = db.addUData(dat); Log.i("haha"," "+check1);
         boolean check5 = db.addGym("ETH",1.23,5.67); Log.i("haha5"," "+check5);
 
         //check retrieve

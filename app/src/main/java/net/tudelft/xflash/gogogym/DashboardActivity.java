@@ -105,6 +105,7 @@ public class DashboardActivity extends AppCompatActivity
     private SharedPreferences mSharedPreferences;
 
     //call sqlite, mandatory!!
+    public static UData cur_user;
     private DBHandler db;
 
     private String start_time;
@@ -210,18 +211,8 @@ public class DashboardActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // Draw PANDA
-        GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
-        gifImageView.setGifImageResource(R.drawable.pandas_happy);
-
-        // Progress Bar (energy & exp)
-        ProgressBar pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
-        ProgressBar pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
-
-        Integer pg_exp_int = pg_exp.getProgress();  // get value exp
-        pg_exp.setProgress((int)(Math.random()*100 + 1)); // set value exp
-
         db = new DBHandler(this);
+        DashboardActivity.cur_user = db.getUData(1);
 
         // TODO: Display activities
         activityLogs = db.getAllLogs();
@@ -240,23 +231,47 @@ public class DashboardActivity extends AppCompatActivity
             }
         };
 
-//Start
         handler.postDelayed(runnable, 1000);
 
         // Set PANDA
         // TODO: Threshold value, mood managament
-        // Happy
-        gifImageView.setGifImageResource(R.drawable.pandas_happy);
-        // Eating
-        gifImageView.setGifImageResource(R.drawable.pandas_eating);
-        // Sad
-        gifImageView.setGifImageResource(R.drawable.pandas_sad);
-        // Dead
-        gifImageView.setGifImageResource(R.drawable.pandas_dead);
 
+        int pet_exp = cur_user.pet_exp;
+        int pet_energy = cur_user.pet_energy;
+        int pet_level =  (int) Math.floor(pet_exp/100);
+        int pet_max_energy = 20+pet_level;
+
+        // Draw PANDA
+        GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
+        gifImageView.setGifImageResource(R.drawable.pandas_happy);
+
+        // Progress Bar (energy & exp)
+        ProgressBar pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
+        ProgressBar pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
+
+        Integer pg_exp_int = pg_exp.getProgress();  // get value exp
+        pg_exp.setProgress(pet_exp % 100); // set value exp
+        pg_energy.setProgress(pet_energy);
+
+        // Set PANDA
+        // TODO: Threshold value, mood managament
+        double ratio = pet_energy /  pet_max_energy;
+        if(ratio > 0.7){
+            // Happy
+            gifImageView.setGifImageResource(R.drawable.pandas_happy);
+        }else if(ratio > 0.5){
+            // Eating
+            gifImageView.setGifImageResource(R.drawable.pandas_eating);
+        }else if(pet_energy >= 1){
+            // Sad
+            gifImageView.setGifImageResource(R.drawable.pandas_sad);
+        }else{
+            // Dead
+            gifImageView.setGifImageResource(R.drawable.pandas_dead);
+        }
 
         pg_exp.setMax(100);    // Max exp
-        pg_energy.setMax(100);  // Max energy
+        pg_energy.setMax(pet_max_energy); // Max energy
 
         // Tab Host
         TabHost host = (TabHost)findViewById(R.id.tabHost);
@@ -286,6 +301,8 @@ public class DashboardActivity extends AppCompatActivity
         spec.setIndicator("Rewards");
         host.addTab(spec);
 
+        TextView ld = (TextView) findViewById(R.id.level_game);
+        ld.setText("Level " + pet_level);
         // Change Tab color
         for(int i=0; i<host.getTabWidget().getChildCount(); i++)
         {
