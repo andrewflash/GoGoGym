@@ -190,7 +190,9 @@ public class DBHandler extends SQLiteOpenHelper {
 
         String sql = "UPDATE "+TABLE_ULOG+" SET finish_time=? WHERE user_id=? AND gym_id=? AND start_time=?";
 
-        db.rawQuery(sql, new String[] {finish_time, Integer.toString(user_id), Integer.toString(gym_id), start_time});
+        Cursor c = db.rawQuery(sql, new String[] {finish_time, Integer.toString(user_id), Integer.toString(gym_id), start_time});
+        c.moveToFirst();
+        c.close();
 
         db.close();
     }
@@ -268,8 +270,9 @@ public class DBHandler extends SQLiteOpenHelper {
 
         String sql = "UPDATE "+TABLE_UDATA+" SET pet_exp=?, pet_energy=? WHERE id=?";
 
-        db.rawQuery(sql, new String[] {Integer.toString(exp), Integer.toString(energy), Integer.toString(user_id)});
-
+        Cursor c = db.rawQuery(sql, new String[] {Integer.toString(exp), Integer.toString(energy), Integer.toString(user_id)});
+        c.moveToFirst();
+        c.close();
         db.close();
     }
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.Snackbar;
@@ -42,25 +43,25 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.Random;
 
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TabHost;
 
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 
+
 public class DashboardActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, ResultCallback<Status> {
 
     protected static final String TAG = "DashboardActivity";
+
+    /* Basic location */
+    protected Location mLastLocation;
 
     /* Geofencing and activity detection */
     /**
@@ -92,7 +93,7 @@ public class DashboardActivity extends AppCompatActivity
      */
     private boolean mGeofencesAdded;
     private boolean isGeofencesEntered;
-
+    private boolean isInGym = Boolean.FALSE;
 
     /**
      * Used when requesting to add or remove geofences.
@@ -120,6 +121,17 @@ public class DashboardActivity extends AppCompatActivity
     private Runnable runnable;
 
     private ArrayAdapter<UserLog> adapter;
+
+    private GifImageView gifImageView;
+
+    // Progress Bar (energy & exp)
+    ProgressBar pg_energy;
+    ProgressBar pg_exp;
+
+    int pet_exp;
+    int pet_energy;
+    int pet_level;
+    int pet_max_energy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,6 +216,7 @@ public class DashboardActivity extends AppCompatActivity
 
         if (getIntent().hasExtra("fromNotification")) {
             isGeofencesEntered = Boolean.TRUE;
+            isInGym = Boolean.TRUE;
         } else {
             isGeofencesEntered = Boolean.FALSE;
         }
@@ -214,43 +227,23 @@ public class DashboardActivity extends AppCompatActivity
         db = new DBHandler(this);
         DashboardActivity.cur_user = db.getUData(1);
 
-        // TODO: Display activities
-        activityLogs = db.getAllLogs();
-        adapter = new detectedActivitiesAdapter(this, 0, activityLogs);
-        activity_lv = (ListView) findViewById(R.id.detected_activities_listview);
-        activity_lv.setAdapter(adapter);
-
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                activityLogs = db.getAllLogs();
-                adapter = new detectedActivitiesAdapter(getApplicationContext(), 0, activityLogs);
-                handler.postDelayed(this, 1000);
-                activity_lv.setAdapter(adapter);
-            }
-        };
-
-        handler.postDelayed(runnable, 1000);
-
         // Set PANDA
         // TODO: Threshold value, mood managament
 
-        int pet_exp = cur_user.pet_exp;
-        int pet_energy = cur_user.pet_energy;
-        int pet_level =  (int) Math.floor(pet_exp/100);
-        int pet_max_energy = 20+pet_level;
+        pet_exp = cur_user.pet_exp;
+        pet_energy = cur_user.pet_energy;
+        pet_level =  (int) Math.floor(pet_exp/100);
+        pet_max_energy = 20+pet_level;
 
         // Draw PANDA
-        GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
+        gifImageView = (GifImageView) findViewById(R.id.GifImageView);
         gifImageView.setGifImageResource(R.drawable.pandas_happy);
 
-        // Progress Bar (energy & exp)
-        ProgressBar pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
-        ProgressBar pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
+        pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
+        pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
 
         Integer pg_exp_int = pg_exp.getProgress();  // get value exp
-        pg_exp.setProgress(pet_exp % 100); // set value exp
+        pg_exp.setProgress(pet_exp); // set value exp
         pg_energy.setProgress(pet_energy);
 
         // Set PANDA
@@ -272,6 +265,54 @@ public class DashboardActivity extends AppCompatActivity
 
         pg_exp.setMax(100);    // Max exp
         pg_energy.setMax(pet_max_energy); // Max energy
+
+        // TODO: Display activities
+        activityLogs = db.getAllLogs();
+        adapter = new detectedActivitiesAdapter(this, 0, activityLogs);
+        activity_lv = (ListView) findViewById(R.id.detected_activities_listview);
+        activity_lv.setAdapter(adapter);
+
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                activityLogs = db.getAllLogs();
+                adapter = new detectedActivitiesAdapter(getApplicationContext(), 0, activityLogs);
+                handler.postDelayed(this, 1000);
+                activity_lv.setAdapter(adapter);
+
+                UData current_user = db.getUData(1);
+                if (isInGym) {
+                    pet_energy = current_user.pet_energy+Constants.ACTIVE_ENERGY_DIFF;
+                    if (pet_energy>100) { pet_energy = 100; }
+                    db.updatePoint(1, current_user.pet_exp, current_user.pet_energy+Constants.ACTIVE_ENERGY_DIFF);
+                    Log.d("GEOFENCE", "increasing, now: "+Integer.toString(current_user.pet_exp) + ", " +Integer.toString(current_user.pet_energy));
+                } else {
+                    pet_energy = current_user.pet_energy-Constants.ACTIVE_ENERGY_DIFF;
+                    if (pet_energy<0) { pet_energy = 0; }
+                    db.updatePoint(1, current_user.pet_exp, pet_energy);
+                    Log.d("GEOFENCE", "decreasing, now: "+Integer.toString(current_user.pet_exp) + ", " +Integer.toString(current_user.pet_energy));
+                }
+                pg_exp.setProgress(current_user.pet_exp);
+                pg_energy.setProgress(current_user.pet_energy);
+                double ratio = pet_energy /  pet_max_energy;
+                if(ratio > 0.7){
+                    // Happy
+                    gifImageView.setGifImageResource(R.drawable.pandas_happy);
+                }else if(ratio > 0.5){
+                    // Eating
+                    gifImageView.setGifImageResource(R.drawable.pandas_eating);
+                }else if(pet_energy >= 1){
+                    // Sad
+                    gifImageView.setGifImageResource(R.drawable.pandas_sad);
+                }else{
+                    // Dead
+                    gifImageView.setGifImageResource(R.drawable.pandas_dead);
+                }
+            }
+        };
+
+        handler.postDelayed(runnable, 1000);
 
         // Tab Host
         TabHost host = (TabHost)findViewById(R.id.tabHost);

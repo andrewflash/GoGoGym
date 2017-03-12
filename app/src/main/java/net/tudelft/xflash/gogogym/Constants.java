@@ -41,6 +41,8 @@ public final class Constants {
 
     public static final int ACTIVE_ENERGY_INC = 5;
 
+    public static final int ACTIVE_ENERGY_DIFF = 1;
+
     public static final String VISIT_DESC = "Visit gym";
 
     public static final String ACTIVE_DESC = "Cardio workout";
