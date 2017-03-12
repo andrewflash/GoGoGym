@@ -37,7 +37,7 @@ public class LoginActivity extends FragmentActivity {
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
-
+    private DBHandler db;
     //Facebook login button
     private FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
         @Override
@@ -55,14 +55,12 @@ public class LoginActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         //call sqlite, mandatory!!
-        DBHandler db = new DBHandler(this);
+        db = new DBHandler(this);
 
         //initiate DB & data (only 1st time)
         db.initiateDB();
         UData dat = new UData(1,"Bontor", "bontor@gmail.com", "12345", 17, "Bambang", 9, 11); boolean check1 = db.addUData(dat); Log.i("haha"," "+check1);
         boolean check5 = db.addGym("ETH",1.23,5.67); Log.i("haha5"," "+check5);
-
-
 
         //check retrieve
         String check2 = (db.getUData(1)).stringify_UData(); Log.i("haha"," "+check2);
@@ -122,13 +120,19 @@ public class LoginActivity extends FragmentActivity {
                     Intent main = new Intent(LoginActivity.this, DashboardActivity.class);
 
                     // TODO: Authentikasi email/username & password
+                    UData login_user = db.findUData(inputEmail.getText().toString(), inputPassword.getText().toString());
+                    if (login_user.user_name != "") {
+                        main.putExtra("name", login_user.user_name);
+                        main.putExtra("userid", login_user.id);
+                        main.putExtra("surname", "");
+                        main.putExtra("imageUrl", "");
 
-                    main.putExtra("name", "Hendra");
-                    main.putExtra("surname", "Hadhil C");
-                    main.putExtra("imageUrl", "");
-
-                    startActivity(main);
-                    finish();
+                        startActivity(main);
+                        finish();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Wrong username and/or password", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(), "Please input username and/or password", Toast.LENGTH_SHORT).show();
                 }

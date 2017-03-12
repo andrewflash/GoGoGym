@@ -33,6 +33,18 @@ public final class Constants {
     private Constants() {
     }
 
+    public static final int VISIT_EXP_INC = 100;
+
+    public static final int VISIT_ENERGY_INC = 20;
+
+    public static final int ACTIVE_EXP_INC = 50;
+
+    public static final int ACTIVE_ENERGY_INC = 10;
+
+    public static final String VISIT_DESC = "Visit gym";
+
+    public static final String ACTIVE_DESC = "Cardio workout";
+
     public static final String PACKAGE_NAME = "com.google.android.gms.location.activityrecognition";
 
     public static final String BROADCAST_ACTION = PACKAGE_NAME + ".BROADCAST_ACTION";

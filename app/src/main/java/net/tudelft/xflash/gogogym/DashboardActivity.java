@@ -40,6 +40,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Random;
 
@@ -99,6 +100,11 @@ public class DashboardActivity extends AppCompatActivity
      */
     private SharedPreferences mSharedPreferences;
 
+    //call sqlite, mandatory!!
+    private DBHandler db;
+
+    private String start_time;
+    private String userid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +115,7 @@ public class DashboardActivity extends AppCompatActivity
         String surname = "";
         String imageUrl = "";
         try {
+            userid = inBundle.get("userid").toString();
             name = inBundle.get("name").toString();
             surname = inBundle.get("surname").toString();
             imageUrl = inBundle.get("imageUrl").toString();
@@ -179,13 +186,8 @@ public class DashboardActivity extends AppCompatActivity
         // Get the geofences used. Geofence data is hard coded in this sample.
         populateGeofenceList();
 
-        // Kick off the request to build GoogleApiClient.
-        buildGoogleApiClient();
-
         if (getIntent().hasExtra("fromNotification")) {
             isGeofencesEntered = Boolean.TRUE;
-            // ADD POINTS FOR VISITING
-
         } else {
             isGeofencesEntered = Boolean.FALSE;
         }
@@ -197,13 +199,14 @@ public class DashboardActivity extends AppCompatActivity
         GifImageView gifImageView = (GifImageView) findViewById(R.id.GifImageView);
         gifImageView.setGifImageResource(R.drawable.pandas_happy);
 
-
         // Progress Bar (energy & exp)
         ProgressBar pg_energy = (ProgressBar) findViewById(R.id.progressBarEnergy);
         ProgressBar pg_exp = (ProgressBar) findViewById(R.id.progressBarExp);
 
         Integer pg_exp_int = pg_exp.getProgress();  // get value exp
         pg_exp.setProgress((int)(Math.random()*100 + 1)); // set value exp
+
+        db = new DBHandler(this);
 
         // Set PANDA
         // TODO: Threshold value, mood managament
@@ -255,6 +258,9 @@ public class DashboardActivity extends AppCompatActivity
             tv.setTextColor(Color.parseColor("#ffffff"));
             tv.setTextSize(10);
         }
+
+        // Kick off the request to build GoogleApiClient.
+        buildGoogleApiClient();
     }
 
 
@@ -374,6 +380,14 @@ public class DashboardActivity extends AppCompatActivity
             startActivityUpdates();
             Toast.makeText(this, getString(R.string.start_activity_detection),
                     Toast.LENGTH_LONG).show();
+            // TODO: ADD EXP POINTS & RECORDS FOR VISITING
+            start_time = Calendar.getInstance().getTime().toString();
+            db.addLog( Integer.parseInt(userid), 1, start_time, Constants.VISIT_DESC);
+            UData userdat = db.getUData(Integer.parseInt(userid));
+            int updatedExp = userdat.pet_exp + Constants.VISIT_EXP_INC;
+            int updatedEnergy = userdat.pet_exp + Constants.VISIT_ENERGY_INC;
+            db.updatePoint(Integer.parseInt(userid), updatedExp, updatedEnergy);
+            isGeofencesEntered = Boolean.FALSE;
         }
         else {
             try {
@@ -506,7 +520,22 @@ public class DashboardActivity extends AppCompatActivity
             ArrayList<DetectedActivity> updatedActivities =
                     intent.getParcelableArrayListExtra(Constants.ACTIVITY_EXTRA);
             Log.d("DashboardActivity", "Activity detected!" + updatedActivities.toString());
-            // ADD POINTS FOR ACTIVITITY
+            if (updatedActivities.get(0).getType() != DetectedActivity.STILL) { // not still = active
+                // TODO: ADD EXP & ENERGY POINTS FOR ACTIVITITY
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MINUTE, 30); // assume to be in gym for 30 minutes
+                String time = cal.getTime().toString();
+                db.finishLog(Integer.parseInt(userid), 1, start_time, time);
+
+                db.addLog( Integer.parseInt(userid), 1, start_time, Constants.ACTIVE_DESC);
+                String active_time = Calendar.getInstance().getTime().toString();
+                db.finishLog(Integer.parseInt(userid), 1, start_time, active_time);
+
+                UData userdat = db.getUData(Integer.parseInt(userid));
+                int updatedExp = userdat.pet_exp + Constants.ACTIVE_EXP_INC;
+                int updatedEnergy = userdat.pet_energy + Constants.ACTIVE_ENERGY_INC;
+                db.updatePoint(Integer.parseInt(userid), updatedExp, updatedEnergy);
+            }
         }
     }
 
